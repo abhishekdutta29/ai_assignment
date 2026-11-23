@@ -1,0 +1,452 @@
+[
+  {
+    "id": "Q01",
+    "question": "Who teaches Artificial Intelligence?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "AI201",
+    "expected_predicate": "taught_by",
+    "gold_answer_contains": ["Alan Turing"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q02",
+    "question": "Who is the instructor for CS102?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "CS102",
+    "expected_predicate": "taught_by",
+    "gold_answer_contains": ["Ada Lovelace"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q03",
+    "question": "How many credits does Machine Learning carry?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "AI301",
+    "expected_predicate": "credits",
+    "gold_answer_contains": ["4 credits"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q04",
+    "question": "How many credits is CS201?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "CS201",
+    "expected_predicate": "credits",
+    "gold_answer_contains": ["3 credits"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q05",
+    "question": "Which semester is Deep Learning offered in?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "AI401",
+    "expected_predicate": "offered_in",
+    "gold_answer_contains": ["Semester 6"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q06",
+    "question": "What is the prerequisite for AI201?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "AI201",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["CS102"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q07",
+    "question": "Which department offers Computer Systems and Architecture?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "CS201",
+    "expected_predicate": "department",
+    "gold_answer_contains": ["Computer Science"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q08",
+    "question": "When is the Course Registration deadline?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "Course Registration",
+    "expected_predicate": "deadline",
+    "gold_answer_contains": ["August 15"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q09",
+    "question": "When does the Final Examination start?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "Final Examination",
+    "expected_predicate": "deadline",
+    "gold_answer_contains": ["December 5"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q10",
+    "question": "What is the minimum attendance requirement?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "attendance requirement",
+    "expected_predicate": "minimum_requirement",
+    "gold_answer_contains": ["75%"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q11",
+    "question": "What is the minimum pass mark?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "pass mark",
+    "expected_predicate": "minimum_requirement",
+    "gold_answer_contains": ["40%"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q12",
+    "question": "What is the Academic probation threshold?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "Academic probation",
+    "expected_predicate": "threshold",
+    "gold_answer_contains": ["2.0 CGPA"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q13",
+    "question": "What is the Dean's Honour List threshold?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "Dean's Honour List",
+    "expected_predicate": "threshold",
+    "gold_answer_contains": ["3.75 CGPA"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q14",
+    "question": "How many credits does BSc in Artificial Intelligence require?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "Bachelor of Science in Artificial Intelligence",
+    "expected_predicate": "degree_credits",
+    "gold_answer_contains": ["120 credits"],
+    "should_fail": false,
+    "category": "Fact Lookup"
+  },
+  {
+    "id": "Q15",
+    "question": "What are all prerequisites of Deep Learning?",
+    "expected_type": "TRANSITIVE_CHAIN",
+    "expected_entity": "AI401",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["AI301", "AI201", "CS102", "CS101"],
+    "should_fail": false,
+    "category": "Transitive Graph Search"
+  },
+  {
+    "id": "Q16",
+    "question": "What is the full prerequisite chain for AI499?",
+    "expected_type": "TRANSITIVE_CHAIN",
+    "expected_entity": "AI499",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["AI401", "AI301", "AI201", "CS102", "CS101"],
+    "should_fail": false,
+    "category": "Transitive Graph Search"
+  },
+  {
+    "id": "Q17",
+    "question": "What are all the prerequisites of Machine Learning?",
+    "expected_type": "TRANSITIVE_CHAIN",
+    "expected_entity": "AI301",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["AI201", "CS102", "CS101"],
+    "should_fail": false,
+    "category": "Transitive Graph Search"
+  },
+  {
+    "id": "Q18",
+    "question": "List all prerequisites of AI201",
+    "expected_type": "TRANSITIVE_CHAIN",
+    "expected_entity": "AI201",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["CS102", "CS101"],
+    "should_fail": false,
+    "category": "Transitive Graph Search"
+  },
+  {
+    "id": "Q19",
+    "question": "What are all prerequisites of CS102?",
+    "expected_type": "TRANSITIVE_CHAIN",
+    "expected_entity": "CS102",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["CS101"],
+    "should_fail": false,
+    "category": "Transitive Graph Search"
+  },
+  {
+    "id": "Q20",
+    "question": "Is CS101 required before Machine Learning?",
+    "expected_type": "REACHABILITY",
+    "expected_entity": "CS101",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["Yes", "prerequisite"],
+    "should_fail": false,
+    "category": "Reachability Search"
+  },
+  {
+    "id": "Q21",
+    "question": "Is CS101 required before AI401?",
+    "expected_type": "REACHABILITY",
+    "expected_entity": "CS101",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["Yes", "prerequisite"],
+    "should_fail": false,
+    "category": "Reachability Search"
+  },
+  {
+    "id": "Q22",
+    "question": "Is MAT101 required before CS102?",
+    "expected_type": "REACHABILITY",
+    "expected_entity": "MAT101",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["No", "No prerequisite"],
+    "should_fail": false,
+    "category": "Reachability Search"
+  },
+  {
+    "id": "Q23",
+    "question": "Is CS102 required before Capstone Project AI499?",
+    "expected_type": "REACHABILITY",
+    "expected_entity": "CS102",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["Yes", "prerequisite"],
+    "should_fail": false,
+    "category": "Reachability Search"
+  },
+  {
+    "id": "Q24",
+    "question": "Is the student eligible for AI499 Capstone Project?",
+    "expected_type": "FORWARD_INFERENCE",
+    "expected_entity": "AI499",
+    "expected_predicate": "eligibility",
+    "gold_answer_contains": ["ELIGIBLE", "AI401"],
+    "should_fail": false,
+    "category": "Forward Chaining"
+  },
+  {
+    "id": "Q25",
+    "question": "Is the student eligible for AI201?",
+    "expected_type": "FORWARD_INFERENCE",
+    "expected_entity": "AI201",
+    "expected_predicate": "eligibility",
+    "gold_answer_contains": ["ELIGIBLE", "CS102"],
+    "should_fail": false,
+    "category": "Forward Chaining"
+  },
+  {
+    "id": "Q26",
+    "question": "Does the student qualify for the Dean's Honour List?",
+    "expected_type": "FORWARD_INFERENCE",
+    "expected_entity": "Dean's Honour List",
+    "expected_predicate": "threshold",
+    "gold_answer_contains": ["QUALIFIES", "3.75"],
+    "should_fail": false,
+    "category": "Forward Chaining"
+  },
+  {
+    "id": "Q27",
+    "question": "Is the student placed on academic probation?",
+    "expected_type": "FORWARD_INFERENCE",
+    "expected_entity": "Academic probation",
+    "expected_predicate": "threshold",
+    "gold_answer_contains": ["GOOD STANDING", "not on probation"],
+    "should_fail": false,
+    "category": "Forward Chaining"
+  },
+  {
+    "id": "Q28",
+    "question": "Can the student take examination in current courses?",
+    "expected_type": "FORWARD_INFERENCE",
+    "expected_entity": "attendance requirement",
+    "expected_predicate": "minimum_requirement",
+    "gold_answer_contains": ["ELIGIBLE", "attendance"],
+    "should_fail": false,
+    "category": "Forward Chaining"
+  },
+  {
+    "id": "Q29",
+    "question": "Why is the student eligible for AI301?",
+    "expected_type": "BACKWARD_PROOF",
+    "expected_entity": "AI301",
+    "expected_predicate": "eligibility",
+    "gold_answer_contains": ["PROVED", "AI201"],
+    "should_fail": false,
+    "category": "Backward Proof"
+  },
+  {
+    "id": "Q30",
+    "question": "Why is student barred from exam?",
+    "expected_type": "BACKWARD_PROOF",
+    "expected_entity": "attendance requirement",
+    "expected_predicate": "minimum_requirement",
+    "gold_answer_contains": ["attendance", "REFUTED"],
+    "should_fail": false,
+    "category": "Backward Proof"
+  },
+  {
+    "id": "Q31",
+    "question": "How many courses are in Semester 4?",
+    "expected_type": "AGGREGATION_COUNT",
+    "expected_entity": "",
+    "expected_predicate": "offered_in",
+    "gold_answer_contains": ["AI201", "CS210", "CS301"],
+    "should_fail": false,
+    "category": "Constraint Aggregation"
+  },
+  {
+    "id": "Q32",
+    "question": "What is the total credit count of Semester 1 courses?",
+    "expected_type": "AGGREGATION_SUM",
+    "expected_entity": "",
+    "expected_predicate": "credits",
+    "gold_answer_contains": ["8 credits", "CS101", "MAT101"],
+    "should_fail": false,
+    "category": "Constraint Aggregation"
+  },
+  {
+    "id": "Q33",
+    "question": "List all courses in Semester 3",
+    "expected_type": "FILTER_LIST",
+    "expected_entity": "",
+    "expected_predicate": "offered_in",
+    "gold_answer_contains": ["CS201", "CS205", "SE201"],
+    "should_fail": false,
+    "category": "Constraint Aggregation"
+  },
+  {
+    "id": "Q34",
+    "question": "Which course has more credits, AI499 or CS101?",
+    "expected_type": "COMPARISON",
+    "expected_entity": "AI499",
+    "expected_predicate": "credits",
+    "gold_answer_contains": ["AI499", "6 credits", "CS101"],
+    "should_fail": false,
+    "category": "Constraint Aggregation"
+  },
+  {
+    "id": "Q35",
+    "question": "Compare credits of AI201 and CS201",
+    "expected_type": "COMPARISON",
+    "expected_entity": "AI201",
+    "expected_predicate": "credits",
+    "gold_answer_contains": ["AI201", "4 credits", "CS201", "3 credits"],
+    "should_fail": false,
+    "category": "Constraint Aggregation"
+  },
+  {
+    "id": "Q36",
+    "question": "Who teaches ML?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "AI301",
+    "expected_predicate": "taught_by",
+    "gold_answer_contains": ["Geoffrey Hinton"],
+    "should_fail": false,
+    "category": "Alias Resolution"
+  },
+  {
+    "id": "Q37",
+    "question": "What is the prereq of DL?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "AI401",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["AI301"],
+    "should_fail": false,
+    "category": "Alias Resolution"
+  },
+  {
+    "id": "Q38",
+    "question": "Who teaches DSA?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "CS102",
+    "expected_predicate": "taught_by",
+    "gold_answer_contains": ["Ada Lovelace"],
+    "should_fail": false,
+    "category": "Alias Resolution"
+  },
+  {
+    "id": "Q39",
+    "question": "Who is the instructor for Machne Learnng?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "AI301",
+    "expected_predicate": "taught_by",
+    "gold_answer_contains": ["Geoffrey Hinton"],
+    "should_fail": false,
+    "category": "Fuzzy Matching (Typo)"
+  },
+  {
+    "id": "Q40",
+    "question": "What is the prereqisite for Artifical Intelligence?",
+    "expected_type": "FACT_LOOKUP",
+    "expected_entity": "AI201",
+    "expected_predicate": "prerequisite",
+    "gold_answer_contains": ["CS102"],
+    "should_fail": false,
+    "category": "Fuzzy Matching (Typo)"
+  },
+  {
+    "id": "Q41",
+    "question": "Who teaches Quantum Physics?",
+    "expected_type": "UNANSWERABLE",
+    "expected_entity": "",
+    "expected_predicate": null,
+    "gold_answer_contains": ["Not found in the knowledge base"],
+    "should_fail": true,
+    "category": "Adversarial / Out of Domain"
+  },
+  {
+    "id": "Q42",
+    "question": "What is the tuition fee for Law school?",
+    "expected_type": "UNANSWERABLE",
+    "expected_entity": "",
+    "expected_predicate": null,
+    "gold_answer_contains": ["Not found in the knowledge base"],
+    "should_fail": true,
+    "category": "Adversarial / Out of Domain"
+  },
+  {
+    "id": "Q43",
+    "question": "Can a student park their spaceship on the campus roof?",
+    "expected_type": "UNANSWERABLE",
+    "expected_entity": "",
+    "expected_predicate": null,
+    "gold_answer_contains": ["Not found in the knowledge base"],
+    "should_fail": true,
+    "category": "Adversarial / Out of Domain"
+  },
+  {
+    "id": "Q44",
+    "question": "What is the cafeteria lunch menu for Friday?",
+    "expected_type": "UNANSWERABLE",
+    "expected_entity": "",
+    "expected_predicate": null,
+    "gold_answer_contains": ["Not found in the knowledge base"],
+    "should_fail": true,
+    "category": "Adversarial / Out of Domain"
+  },
+  {
+    "id": "Q45",
+    "question": "Who is the head coach of the university football team?",
+    "expected_type": "UNANSWERABLE",
+    "expected_entity": "",
+    "expected_predicate": null,
+    "gold_answer_contains": ["Not found in the knowledge base"],
+    "should_fail": true,
+    "category": "Adversarial / Out of Domain"
+  }
+]

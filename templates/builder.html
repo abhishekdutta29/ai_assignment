@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block title %}Document Ingestion & Direct Q&A – KnowledgeLens{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="fa-solid fa-file-circle-plus"></i> Module 1: Document Ingestion & Direct Q&A</h1>
+            <p class="page-description">
+                Upload or paste structured academic documents to build a Symbolic Knowledge Base. Once ingested, ask questions directly here or explore candidate questions inferred from the document.
+            </p>
+        </div>
+        <div class="header-buttons">
+            <button id="loadDefaultBtn" class="btn btn-outline">
+                <i class="fa-solid fa-rotate-left"></i> Load Built-in Programme Handbook
+            </button>
+        </div>
+    </div>
+
+    <!-- 1. Document Ingestion Section -->
+    <div class="card" style="margin-bottom: 24px;">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-cloud-arrow-up"></i> Provide Input Document</h2>
+            <span class="badge badge-info" id="currentDocPill">{{ doc_name }}</span>
+        </div>
+        <div class="card-body">
+            <div class="grid-2col">
+                <!-- File Upload -->
+                <div>
+                    <form id="uploadFileForm" enctype="multipart/form-data" class="upload-section">
+                        <label class="form-label">Upload Document (.txt, .md, .pdf, .docx):</label>
+                        <div class="file-dropzone" id="dropzone">
+                            <i class="fa-solid fa-file-arrow-up dropzone-icon"></i>
+                            <span class="dropzone-text">Drag & drop document or <span class="highlight">browse</span></span>
+                            <span class="dropzone-sub">Plain text, Markdown, PDF, or DOCX</span>
+                            <input type="file" id="fileInput" name="file" accept=".txt,.md,.pdf,.docx" class="file-input-hidden">
+                        </div>
+                        <div id="selectedFileName" class="selected-file-pill hidden">
+                            <i class="fa-solid fa-file"></i>
+                            <span id="fileNameSpan"></span>
+                            <button type="button" id="removeFileBtn" class="btn-clear"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <button type="submit" id="uploadFileBtn" class="btn btn-primary" style="margin-top: 12px; width: 100%;">
+                            <i class="fa-solid fa-gears"></i> Extract & Build Knowledge Base
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Text Paste -->
+                <div>
+                    <form id="pasteTextForm">
+                        <label class="form-label" for="pastedText">Or Paste Text Directly:</label>
+                        <textarea id="pastedText" name="pasted_text" rows="6" class="form-textarea" placeholder="Paste courses, credits, prerequisites, faculty assignments, deadlines, or markdown tables..."></textarea>
+                        <button type="submit" class="btn btn-secondary" style="margin-top: 10px; width: 100%;">
+                            <i class="fa-solid fa-bolt"></i> Ingest & Parse Pasted Text
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. Direct Q&A & Possible Outcome Questions Section (Prompted Right After Input) -->
+    <div class="card" id="qaSection" style="margin-bottom: 24px; border: 1px solid var(--accent-blue);">
+        <div class="card-header" style="background: rgba(59, 130, 246, 0.08);">
+            <div>
+                <h2><i class="fa-solid fa-comments"></i> Ask Questions on Ingested Document</h2>
+                <p class="text-muted" style="font-size: 0.82rem; margin-top: 2px;">
+                    Type any question below to query the Knowledge Base with full step-by-step symbolic reasoning.
+                </p>
+            </div>
+            <span class="badge badge-success"><i class="fa-solid fa-check"></i> Ready to Answer</span>
+        </div>
+        <div class="card-body">
+            <!-- Extraction Warning Banner (Shown if 0 triples extracted) -->
+            <div id="extractionWarningBanner" class="hidden" style="margin-bottom: 16px; padding: 12px 16px; border-radius: var(--radius-sm); background: rgba(245, 158, 11, 0.15); border: 1px solid var(--accent-amber); color: var(--text-primary); font-size: 0.88rem;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fa-solid fa-triangle-exclamation" style="color: var(--accent-amber); font-size: 1.1rem;"></i>
+                    <strong id="warningBannerTitle">0 Triples Extracted (0% Coverage)</strong>
+                </div>
+                <p id="warningBannerMsg" style="margin-top: 4px; font-size: 0.82rem; color: var(--text-secondary);">
+                    None of the sentences in the uploaded file matched any of the symbolic extraction patterns in the rule table.
+                </p>
+            </div>
+
+            <!-- Inline Question Input -->
+            <form id="directAskForm" style="display: flex; gap: 10px; margin-bottom: 14px;">
+                <input type="text" id="directQuestionInput" class="form-input" style="font-size: 0.95rem; padding: 12px 16px;" placeholder="Type your question (e.g. 'What is Artificial Intelligence', 'Who teaches CS102?')..." autocomplete="off">
+                <button type="submit" id="directAskBtn" class="btn btn-primary" style="padding: 0 24px; white-space: nowrap;">
+                    <i class="fa-solid fa-paper-plane"></i> Ask Question
+                </button>
+            </form>
+
+            <!-- Direct Answer Result Box (Shown when a question is answered) -->
+            <div id="directAnswerBox" class="direct-answer-container hidden">
+                <div class="answer-card-header">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span class="badge badge-info" id="answerTechniqueBadge">Technique</span>
+                        <span class="badge badge-complexity" id="answerComplexityBadge">Complexity</span>
+                    </div>
+                    <span class="badge badge-success" id="answerStatusBadge">Verified from KB</span>
+                </div>
+                <div class="answer-text-content">
+                    <p id="directAnswerText" style="font-size: 1.05rem; font-weight: 500; line-height: 1.5; color: var(--text-primary);"></p>
+                </div>
+
+                <!-- Trace Accordion -->
+                <details class="trace-accordion" id="traceDetails">
+                    <summary class="trace-summary"><i class="fa-solid fa-microscope"></i> View Complete Symbolic Reasoning Trace & Provenance</summary>
+                    <div class="trace-accordion-body">
+                        <div style="margin-bottom: 10px;">
+                            <strong>Query Type:</strong> <code id="traceQType">-</code> |
+                            <strong>Detected Predicate:</strong> <code id="tracePredicate">-</code>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>Step-by-Step Inference Trace:</strong>
+                            <ol id="traceStepsList" style="padding-left: 20px; font-size: 0.85rem; margin-top: 4px;"></ol>
+                        </div>
+                        <div id="proofTreeBoxContainer" class="hidden" style="margin-bottom: 10px;">
+                            <strong>Backward Proof Tree:</strong>
+                            <div id="proofTreeRender" class="proof-tree-box" style="margin-top: 4px;"></div>
+                        </div>
+                        <div>
+                            <strong>Supporting Triples with Source Line Numbers:</strong>
+                            <div id="traceEvidenceList" class="evidence-list" style="margin-top: 6px;"></div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const selectedFileDiv = document.getElementById('selectedFileName');
+    const fileNameSpan = document.getElementById('fileNameSpan');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+    const uploadForm = document.getElementById('uploadFileForm');
+    const pasteForm = document.getElementById('pasteTextForm');
+    const loadDefaultBtn = document.getElementById('loadDefaultBtn');
+
+    // Direct Q&A elements
+    const directAskForm = document.getElementById('directAskForm');
+    const directQuestionInput = document.getElementById('directQuestionInput');
+    const directAskBtn = document.getElementById('directAskBtn');
+    const possibleQsContainer = document.getElementById('possibleQuestionsContainer');
+    const directAnswerBox = document.getElementById('directAnswerBox');
+    const directAnswerText = document.getElementById('directAnswerText');
+    const answerTechniqueBadge = document.getElementById('answerTechniqueBadge');
+    const answerComplexityBadge = document.getElementById('answerComplexityBadge');
+    const answerStatusBadge = document.getElementById('answerStatusBadge');
+    const traceQType = document.getElementById('traceQType');
+    const tracePredicate = document.getElementById('tracePredicate');
+    const traceStepsList = document.getElementById('traceStepsList');
+    const traceEvidenceList = document.getElementById('traceEvidenceList');
+    const proofTreeBoxContainer = document.getElementById('proofTreeBoxContainer');
+    const proofTreeRender = document.getElementById('proofTreeRender');
+
+    // Initial Load
+    fetchKbSummary();
+
+    function fetchKbSummary() {
+        fetch('/api/kb/summary')
+            .then(r => r.json())
+            .then(data => {});
+    }
+
+    // Direct Q&A form submission
+    directAskForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const q = directQuestionInput.value.trim();
+        if (q) {
+            askDirectQuestion(q);
+        }
+    });
+
+    function askDirectQuestion(questionText) {
+        directAskBtn.disabled = true;
+        directAskBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Answering...';
+        directAnswerBox.classList.remove('hidden');
+        directAnswerText.innerHTML = '<em class="text-muted">Evaluating symbolic reasoning engine over Knowledge Base...</em>';
+
+        fetch('/api/ask', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ question: questionText })
+        })
+        .then(r => r.json())
+        .then(data => {
+            directAskBtn.disabled = false;
+            directAskBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Ask Question';
+
+            if (data.status === 'success') {
+                directAnswerText.textContent = data.answer;
+                answerTechniqueBadge.textContent = data.trace.technique_name || 'Direct Lookup';
+                answerComplexityBadge.textContent = data.trace.time_complexity || 'O(1)';
+                
+                if (data.answer_status === 'SUCCESS') {
+                    answerStatusBadge.className = 'badge badge-success';
+                    answerStatusBadge.innerHTML = '<i class="fa-solid fa-check"></i> Answered from KB';
+                } else {
+                    answerStatusBadge.className = 'badge badge-danger';
+                    answerStatusBadge.innerHTML = '<i class="fa-solid fa-shield"></i> Closed-World Boundary';
+                }
+
+                // Render Trace details
+                traceQType.textContent = data.parsed_query.qtype;
+                tracePredicate.textContent = data.parsed_query.predicate || 'None';
+
+                traceStepsList.innerHTML = '';
+                (data.trace.steps || []).forEach(step => {
+                    const li = document.createElement('li');
+                    li.textContent = step;
+                    traceStepsList.appendChild(li);
+                });
+
+                // Proof tree
+                if (data.trace.proof_tree) {
+                    proofTreeBoxContainer.classList.remove('hidden');
+                    const pt = data.trace.proof_tree;
+                    let ptHtml = `<div><strong>Goal:</strong> <code>${pt.goal}</code> <span class="badge ${pt.status === 'PROVED' ? 'badge-success' : 'badge-danger'}">${pt.status}</span></div>`;
+                    ptHtml += `<div><strong>Rule:</strong> ${pt.rule_applied}</div>`;
+                    if (pt.subgoals && pt.subgoals.length) {
+                        ptHtml += `<ul style="padding-left: 18px; margin-top: 4px;">`;
+                        pt.subgoals.forEach(sg => {
+                            ptHtml += `<li><code>${sg.subgoal}</code> (${sg.status}) - ${sg.fact}</li>`;
+                        });
+                        ptHtml += `</ul>`;
+                    }
+                    proofTreeRender.innerHTML = ptHtml;
+                } else {
+                    proofTreeBoxContainer.classList.add('hidden');
+                }
+
+                // Evidence list
+                traceEvidenceList.innerHTML = '';
+                const evList = data.trace.supporting_triples || [];
+                if (evList.length > 0) {
+                    evList.forEach(t => {
+                        const item = document.createElement('div');
+                        item.className = 'evidence-item';
+                        item.innerHTML = `
+                            <div class="evidence-header">
+                                <span>(${t.subject}, ${t.predicate}, ${t.object})</span>
+                                <code style="font-size: 0.72rem;">${t.rule_id}</code>
+                            </div>
+                            <div class="evidence-sentence">Line ${t.source_line}: "${t.raw_text}"</div>
+                        `;
+                        traceEvidenceList.appendChild(item);
+                    });
+                } else {
+                    traceEvidenceList.innerHTML = '<span class="text-muted" style="font-size: 0.8rem;">No supporting triples required (boundary check or student state).</span>';
+                }
+
+                // Open the details accordion
+                document.getElementById('traceDetails').open = true;
+
+                // Smooth scroll to answer
+                directAnswerBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            } else {
+                directAnswerText.textContent = data.message || 'Error executing query.';
+            }
+        })
+        .catch(err => {
+            directAskBtn.disabled = false;
+            directAskBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Ask Question';
+            directAnswerText.textContent = `Error: ${err}`;
+        });
+    }
+
+    // Dropzone logic
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('drag-active'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-active'));
+    dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('drag-active');
+        if (e.dataTransfer.files.length) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect();
+        }
+    });
+
+    fileInput.addEventListener('change', handleFileSelect);
+
+    function handleFileSelect() {
+        if (fileInput.files.length > 0) {
+            fileNameSpan.textContent = fileInput.files[0].name;
+            selectedFileDiv.classList.remove('hidden');
+        }
+    }
+
+    removeFileBtn.addEventListener('click', () => {
+        fileInput.value = '';
+        selectedFileDiv.classList.add('hidden');
+    });
+
+    // Upload file submission
+    uploadForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!fileInput.files.length) {
+            window.showToast('Please select a file to upload.', 'error');
+            return;
+        }
+        const formData = new FormData(uploadForm);
+        window.showToast('Extracting knowledge triples from file...', 'info');
+        fetch('/api/upload', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.showToast(data.message, 'success');
+                    const activeBadge = document.getElementById('activeDocName');
+                    if (activeBadge) activeBadge.textContent = data.doc_name;
+                    document.getElementById('currentDocPill').textContent = data.doc_name;
+                    updateStats(data);
+                    // Scroll down to the Q&A section
+                    document.getElementById('qaSection').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    window.showToast(data.message, 'error');
+                }
+            });
+    });
+
+    // Paste text submission
+    pasteForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const text = document.getElementById('pastedText').value.trim();
+        if (!text) {
+            window.showToast('Please paste some text to extract.', 'error');
+            return;
+        }
+        const formData = new FormData(pasteForm);
+        window.showToast('Extracting knowledge triples from pasted text...', 'info');
+        fetch('/api/upload', { method: 'POST', body: formData })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.showToast(data.message, 'success');
+                    const activeBadge = document.getElementById('activeDocName');
+                    if (activeBadge) activeBadge.textContent = data.doc_name;
+                    document.getElementById('currentDocPill').textContent = data.doc_name;
+                    updateStats(data);
+                    // Scroll down to the Q&A section
+                    document.getElementById('qaSection').scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    window.showToast(data.message, 'error');
+                }
+            });
+    });
+
+    // Load default demo
+    loadDefaultBtn.addEventListener('click', () => {
+        window.showToast('Restoring built-in University Programme Handbook...', 'info');
+        fetch('/api/kb/load-default', { method: 'POST' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.showToast(data.message, 'success');
+                    location.reload();
+                }
+            });
+    });
+
+    function updateStats(data) {
+        const count = data.triples_count || 0;
+        const warnBanner = document.getElementById('extractionWarningBanner');
+        if (warnBanner) {
+            if (count === 0) {
+                warnBanner.classList.remove('hidden');
+                document.getElementById('warningBannerTitle').textContent = 'Notice: 0 Knowledge Triples Extracted (0% Coverage)';
+                document.getElementById('warningBannerMsg').textContent = 'None of the sentences in the uploaded file matched the active symbolic extraction rules.';
+            } else {
+                warnBanner.classList.add('hidden');
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

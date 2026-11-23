@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}Knowledge Base Explorer – KnowledgeLens{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="fa-solid fa-diagram-project"></i> Module 1: Knowledge Base Explorer</h1>
+            <p class="page-description">
+                Interactive inspection of the Symbolic Knowledge Graph and Triple Store. Browse extracted relationships, filter by predicate, visualize graph topology, and audit unparsed sentences.
+            </p>
+        </div>
+        <div class="header-buttons">
+            <a href="/api/kb/export" class="btn btn-outline" download>
+                <i class="fa-solid fa-download"></i> Download KB (JSON)
+            </a>
+        </div>
+    </div>
+
+    <!-- Explorer Stats -->
+    <div class="metrics-grid">
+        <div class="metric-card">
+            <div class="metric-icon blue"><i class="fa-solid fa-share-nodes"></i></div>
+            <div class="metric-info">
+                <span class="metric-label">Graph Nodes (Entities)</span>
+                <span class="metric-value" id="statNodeCount">{{ stats.entities_count }}</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon green"><i class="fa-solid fa-arrows-split-up-and-left"></i></div>
+            <div class="metric-info">
+                <span class="metric-label">Graph Edges (Triples)</span>
+                <span class="metric-value" id="statEdgeCount">{{ stats.triples_count }}</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon purple"><i class="fa-solid fa-tags"></i></div>
+            <div class="metric-info">
+                <span class="metric-label">Distinct Predicates</span>
+                <span class="metric-value">{{ stats.predicates_count }}</span>
+            </div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-icon amber"><i class="fa-solid fa-percent"></i></div>
+            <div class="metric-info">
+                <span class="metric-label">Extraction Coverage</span>
+                <span class="metric-value">{{ stats.coverage }}%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab Navigation for Explorer View -->
+    <div class="tab-bar">
+        <button class="tab-btn active" data-tab="tabGraph"><i class="fa-solid fa-circle-nodes"></i> Force-Directed Graph</button>
+        <button class="tab-btn" data-tab="tabTable"><i class="fa-solid fa-table"></i> Triple Store Table</button>
+        <button class="tab-btn" data-tab="tabAliases"><i class="fa-solid fa-address-book"></i> Entity Index & Aliases</button>
+        <button class="tab-btn" data-tab="tabUnparsed"><i class="fa-solid fa-triangle-exclamation"></i> Unparsed Sentences (Coverage Audit)</button>
+    </div>
+
+    <!-- Tab 1: Force-Directed Knowledge Graph -->
+    <div id="tabGraph" class="tab-content active">
+        <div class="card graph-card">
+            <div class="card-header graph-toolbar">
+                <div class="graph-legend">
+                    <span class="legend-item"><span class="legend-dot" style="background: #3b82f6;"></span> Course</span>
+                    <span class="legend-item"><span class="legend-dot" style="background: #10b981;"></span> Instructor</span>
+                    <span class="legend-item"><span class="legend-dot" style="background: #8b5cf6;"></span> Department</span>
+                    <span class="legend-item"><span class="legend-dot" style="background: #f59e0b;"></span> Semester</span>
+                    <span class="legend-item"><span class="legend-dot" style="background: #ef4444;"></span> Assessment</span>
+                    <span class="legend-item"><span class="legend-dot" style="background: #64748b;"></span> General</span>
+                </div>
+                <div class="graph-actions">
+                    <button id="resetZoomBtn" class="btn btn-sm btn-outline"><i class="fa-solid fa-arrows-to-eye"></i> Fit Graph</button>
+                    <button id="togglePhysicsBtn" class="btn btn-sm btn-outline"><i class="fa-solid fa-atom"></i> Toggle Physics</button>
+                </div>
+            </div>
+            <div class="graph-container-wrapper">
+                <div id="kgNetwork" class="graph-viewport"></div>
+                <canvas id="kgCanvasFallback" class="graph-viewport hidden"></canvas>
+                <div id="nodeDetailsDrawer" class="node-drawer hidden">
+                    <div class="drawer-header">
+                        <h3 id="drawerTitle">Node Details</h3>
+                        <button id="closeDrawerBtn" class="btn-clear"><i class="fa-solid fa-xmark"></i></button>
+                    </div>
+                    <div id="drawerContent" class="drawer-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 2: Triple Store Table -->
+    <div id="tabTable" class="tab-content">
+        <div class="card">
+            <div class="card-header table-filter-header">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="tripleSearchInput" placeholder="Search subject, predicate, object, or rule..." class="form-input">
+                </div>
+                <div class="filter-box">
+                    <label>Filter Predicate:</label>
+                    <select id="predicateFilterSelect" class="form-select">
+                        <option value="">All Predicates ({{ predicates|length }})</option>
+                        {% for p in predicates %}
+                        <option value="{{ p }}">{{ p }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="card-body table-responsive" style="max-height: 600px; overflow-y: auto;">
+                <table class="data-table" id="triplesTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>Subject</th>
+                            <th>Predicate</th>
+                            <th>Object</th>
+                            <th>Source Line</th>
+                            <th>Rule ID</th>
+                            <th>Source Evidence Sentence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="triplesTableBody">
+                        <tr><td colspan="7" class="text-center">Loading Knowledge Triples...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 3: Entity Index & Aliases -->
+    <div id="tabAliases" class="tab-content">
+        <div class="grid-2col">
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-id-badge"></i> Canonical Entities (<span id="canonicalCount">0</span>)</h2>
+                </div>
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    <ul class="entity-list" id="canonicalEntityList"></ul>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <h2><i class="fa-solid fa-arrows-turn-to-dots"></i> Alias & Acronym Dictionary (<span id="aliasCount">0</span>)</h2>
+                </div>
+                <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Query Alias / Acronym</th>
+                                <th>&rarr; Canonical Resolved Entity</th>
+                            </tr>
+                        </thead>
+                        <tbody id="aliasTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tab 4: Unparsed Sentences (Coverage Audit) -->
+    <div id="tabUnparsed" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <div>
+                    <h2><i class="fa-solid fa-triangle-exclamation"></i> Unparsed Sentences & Coverage Analysis</h2>
+                    <p class="card-subtitle text-muted">
+                        Lines and sentences that did not trigger any symbolic extraction rule. Use this audit data for the IEEE report's coverage discussion.
+                    </p>
+                </div>
+                <span class="badge badge-warning" id="unparsedCountBadge">0 unparsed</span>
+            </div>
+            <div class="card-body table-responsive" style="max-height: 550px; overflow-y: auto;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">Line #</th>
+                            <th>Unparsed Sentence Text</th>
+                            <th>Reason / Nature</th>
+                        </tr>
+                    </thead>
+                    <tbody id="unparsedTableBody">
+                        <tr><td colspan="3" class="text-center">Loading unparsed sentence audit...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/graph.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    let allTriples = [];
+    let kbData = null;
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            const target = document.getElementById(btn.dataset.tab);
+            if (target) target.classList.add('active');
+            if (btn.dataset.tab === 'tabGraph' && window.kgNetworkInstance) {
+                setTimeout(() => window.kgNetworkInstance.fit(), 200);
+            }
+        });
+    });
+
+    // Fetch full KB summary
+    fetch('/api/kb/summary')
+        .then(r => r.json())
+        .then(data => {
+            if (data.status === 'success') {
+                kbData = data;
+                allTriples = data.triples || [];
+
+                // Render Table
+                renderTriplesTable(allTriples);
+
+                // Render Graph
+                if (data.graph && window.initKnowledgeGraph) {
+                    window.initKnowledgeGraph(data.graph);
+                }
+
+                // Render Aliases
+                renderAliases(data);
+
+                // Render Unparsed
+                renderUnparsed(data.metadata ? data.metadata.unparsed_sentences : []);
+            }
+        });
+
+    function renderTriplesTable(triples) {
+        const tbody = document.getElementById('triplesTableBody');
+        tbody.innerHTML = '';
+        if (!triples.length) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No triples found matching filters.</td></tr>';
+            return;
+        }
+
+        triples.forEach((t, i) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${i + 1}</td>
+                <td><strong>${t.subject}</strong></td>
+                <td><span class="badge badge-pred">${t.predicate}</span></td>
+                <td>${t.object}</td>
+                <td>Line ${t.source_line}</td>
+                <td><code>${t.rule_id}</code></td>
+                <td class="text-muted"><small>${t.raw_text}</small></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // Search and filter
+    const searchInput = document.getElementById('tripleSearchInput');
+    const predSelect = document.getElementById('predicateFilterSelect');
+
+    function filterTriples() {
+        const q = searchInput.value.toLowerCase().trim();
+        const pred = predSelect.value.toLowerCase().trim();
+
+        const filtered = allTriples.filter(t => {
+            const matchesPred = !pred || t.predicate.toLowerCase() === pred;
+            const matchesQ = !q || 
+                t.subject.toLowerCase().includes(q) || 
+                t.predicate.toLowerCase().includes(q) || 
+                t.object.toLowerCase().includes(q) || 
+                t.rule_id.toLowerCase().includes(q) ||
+                t.raw_text.toLowerCase().includes(q);
+            return matchesPred && matchesQ;
+        });
+        renderTriplesTable(filtered);
+    }
+
+    searchInput.addEventListener('input', filterTriples);
+    predSelect.addEventListener('change', filterTriples);
+
+    function renderAliases(data) {
+        document.getElementById('canonicalCount').textContent = (data.entities || []).length;
+        const cList = document.getElementById('canonicalEntityList');
+        cList.innerHTML = '';
+        (data.entities || []).forEach(e => {
+            const cat = (data.entity_categories || {})[e] || 'General';
+            const li = document.createElement('li');
+            li.className = 'entity-badge';
+            li.innerHTML = `<span>${e}</span> <small class="cat-pill">${cat}</small>`;
+            cList.appendChild(li);
+        });
+
+        const aliasKeys = Object.keys(data.aliases || {});
+        document.getElementById('aliasCount').textContent = aliasKeys.length;
+        const aTbody = document.getElementById('aliasTableBody');
+        aTbody.innerHTML = '';
+        aliasKeys.sort().forEach(k => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td><code>${k}</code></td><td><strong>${data.aliases[k]}</strong></td>`;
+            aTbody.appendChild(tr);
+        });
+    }
+
+    function renderUnparsed(unparsed) {
+        const tbody = document.getElementById('unparsedTableBody');
+        tbody.innerHTML = '';
+        document.getElementById('unparsedCountBadge').textContent = `${(unparsed || []).length} unparsed items`;
+
+        if (!unparsed || !unparsed.length) {
+            tbody.innerHTML = '<tr><td colspan="3" class="text-center text-muted">All sentences were parsed into triples (100% coverage).</td></tr>';
+            return;
+        }
+
+        unparsed.forEach(item => {
+            let reason = 'Descriptive commentary / prose';
+            if (item.text.includes('=')) reason = 'Decorative header boundary';
+            else if (item.text.startsWith('###') || item.text.startsWith('1.') || item.text.startsWith('2.')) reason = 'Section title header';
+            else if (item.text.includes('if and only if')) reason = 'High-order logic statement';
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><code>Line ${item.line}</code></td>
+                <td>${item.text}</td>
+                <td><span class="badge badge-secondary">${reason}</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+});
+</script>
+{% endblock %}

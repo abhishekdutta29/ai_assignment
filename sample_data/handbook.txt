@@ -1,0 +1,189 @@
+================================================================================
+           UNIVERSITY PROGRAMME HANDBOOK (ACADEMIC YEAR 2026-2027)
+               School of Computing & School of Science
+================================================================================
+
+1. ACADEMIC PROGRAMMES AND DEPARTMENTS
+The School of Computing offers degree programmes in computational disciplines.
+Bachelor of Science in Artificial Intelligence requires 120 credits.
+Bachelor of Science in Computer Science requires 120 credits.
+The Department of Artificial Intelligence belongs to the School of Computing.
+The Department of Computer Science belongs to the School of Computing.
+The Department of Software Engineering belongs to the School of Computing.
+The Department of Mathematics belongs to the School of Science.
+
+2. COURSE CURRICULUM AND STRUCTURE
+The undergraduate curricula comprise core foundational, intermediate, and advanced courses.
+
+CS101 is Introduction to Programming.
+CS101 carries 4 credits.
+CS101 is offered in Semester 1.
+CS101 belongs to the Department of Computer Science.
+CS101 is taught by Dr. Ada Lovelace.
+
+MAT101 is Linear Algebra and Calculus.
+MAT101 carries 4 credits.
+MAT101 is offered in Semester 1.
+MAT101 belongs to the Department of Mathematics.
+MAT101 is taught by Prof. Carl Gauss.
+
+CS102 is Data Structures and Algorithms.
+CS102 carries 4 credits.
+CS102 is offered in Semester 2.
+CS102 requires CS101.
+CS102 belongs to the Department of Computer Science.
+CS102 is taught by Dr. Ada Lovelace.
+
+MAT202 is Probability and Statistics.
+MAT202 carries 3 credits.
+MAT202 is offered in Semester 2.
+MAT202 requires MAT101.
+MAT202 belongs to the Department of Mathematics.
+MAT202 is taught by Dr. Claude Shannon.
+
+CS201 is Computer Systems and Architecture.
+CS201 carries 3 credits.
+CS201 is offered in Semester 3.
+CS201 requires CS101.
+CS201 belongs to the Department of Computer Science.
+CS201 is taught by Prof. John von Neumann.
+
+CS205 is Object Oriented Programming.
+CS205 carries 3 credits.
+CS205 is offered in Semester 3.
+CS205 requires CS101.
+CS205 belongs to the Department of Computer Science.
+CS205 is taught by Dr. Grace Hopper.
+
+SE201 is Software Engineering Principles.
+SE201 carries 3 credits.
+SE201 is offered in Semester 3.
+SE201 requires CS102.
+SE201 belongs to the Department of Software Engineering.
+SE201 is taught by Prof. Margaret Hamilton.
+
+AI201 is Artificial Intelligence.
+AI201 carries 4 credits.
+AI201 is offered in Semester 4.
+AI201 requires CS102.
+AI201 belongs to the Department of Artificial Intelligence.
+AI201 is taught by Prof. Alan Turing.
+
+CS210 is Database Management Systems.
+CS210 carries 4 credits.
+CS210 is offered in Semester 4.
+CS210 requires CS102.
+CS210 belongs to the Department of Computer Science.
+CS210 is taught by Dr. Edgar Codd.
+
+CS301 is Operating Systems.
+CS301 carries 4 credits.
+CS301 is offered in Semester 4.
+CS301 requires CS201.
+CS301 belongs to the Department of Computer Science.
+CS301 is taught by Prof. Linus Torvalds.
+
+AI301 is Machine Learning.
+AI301 carries 4 credits.
+AI301 is offered in Semester 5.
+AI301 requires AI201.
+AI301 belongs to the Department of Artificial Intelligence.
+AI301 is taught by Prof. Geoffrey Hinton.
+
+CS320 is Design and Analysis of Algorithms.
+CS320 carries 4 credits.
+CS320 is offered in Semester 5.
+CS320 requires CS102.
+CS320 belongs to the Department of Computer Science.
+CS320 is taught by Dr. Donald Knuth.
+
+AI305 is Natural Language Processing.
+AI305 carries 3 credits.
+AI305 is offered in Semester 6.
+AI305 requires AI201.
+AI305 belongs to the Department of Artificial Intelligence.
+AI305 is taught by Dr. Noam Chomsky.
+
+AI401 is Deep Learning.
+AI401 carries 4 credits.
+AI401 is offered in Semester 6.
+AI401 requires AI301.
+AI401 belongs to the Department of Artificial Intelligence.
+AI401 is taught by Dr. Yann LeCun.
+
+AI410 is Computer Vision.
+AI410 carries 3 credits.
+AI410 is offered in Semester 6.
+AI410 requires AI301.
+AI410 belongs to the Department of Artificial Intelligence.
+AI410 is taught by Dr. Fei-Fei Li.
+
+AI499 is Capstone Project.
+AI499 carries 6 credits.
+AI499 is offered in Semester 8.
+AI499 requires AI401.
+AI499 belongs to the Department of Artificial Intelligence.
+AI499 is taught by Prof. Alan Turing.
+
+3. COURSE DIRECTORY SUMMARY TABLE
+| Code | Title | Credits | Semester | Prerequisite | Instructor | Department |
+| CS101 | Introduction to Programming | 4 | Semester 1 | None | Dr. Ada Lovelace | Computer Science |
+| MAT101 | Linear Algebra and Calculus | 4 | Semester 1 | None | Prof. Carl Gauss | Mathematics |
+| CS102 | Data Structures and Algorithms | 4 | Semester 2 | CS101 | Dr. Ada Lovelace | Computer Science |
+| MAT202 | Probability and Statistics | 3 | Semester 2 | MAT101 | Dr. Claude Shannon | Mathematics |
+| CS201 | Computer Systems and Architecture | 3 | Semester 3 | CS101 | Prof. John von Neumann | Computer Science |
+| CS205 | Object Oriented Programming | 3 | Semester 3 | CS101 | Dr. Grace Hopper | Computer Science |
+| SE201 | Software Engineering Principles | 3 | Semester 3 | CS102 | Prof. Margaret Hamilton | Software Engineering |
+| AI201 | Artificial Intelligence | 4 | Semester 4 | CS102 | Prof. Alan Turing | Artificial Intelligence |
+| CS210 | Database Management Systems | 4 | Semester 4 | CS102 | Dr. Edgar Codd | Computer Science |
+| CS301 | Operating Systems | 4 | Semester 4 | CS201 | Prof. Linus Torvalds | Computer Science |
+| AI301 | Machine Learning | 4 | Semester 5 | AI201 | Prof. Geoffrey Hinton | Artificial Intelligence |
+| CS320 | Design and Analysis of Algorithms | 4 | Semester 5 | CS102 | Dr. Donald Knuth | Computer Science |
+| AI305 | Natural Language Processing | 3 | Semester 6 | AI201 | Dr. Noam Chomsky | Artificial Intelligence |
+| AI401 | Deep Learning | 4 | Semester 6 | AI301 | Dr. Yann LeCun | Artificial Intelligence |
+| AI410 | Computer Vision | 3 | Semester 6 | AI301 | Dr. Fei-Fei Li | Artificial Intelligence |
+| AI499 | Capstone Project | 6 | Semester 8 | AI401 | Prof. Alan Turing | Artificial Intelligence |
+
+4. ASSESSMENT AND GRADING SCHEMES
+Assessment breakdowns for signature courses are structured as follows:
+In AI201, Midterm Exam carries 30%.
+In AI201, Final Exam carries 50%.
+In AI201, Assignments carry 20%.
+
+In AI301, Midterm Exam carries 25%.
+In AI301, Final Project carries 45%.
+In AI301, Quizzes carry 30%.
+
+In CS102, Lab Exam carries 30%.
+In CS102, Final Exam carries 40%.
+In CS102, Problem Sets carry 30%.
+
+In CS210, Practical Exam carries 30%.
+In CS210, Final Exam carries 50%.
+In CS210, Coursework carries 20%.
+
+5. IMPORTANT ACADEMIC DEADLINES
+The Course Registration deadline is August 15.
+The Add/Drop deadline is August 30.
+Midterm Examination starts on October 10.
+The Final Project Submission deadline is November 25.
+Final Examination starts on December 5.
+
+6. INSTITUTIONAL POLICIES AND THRESHOLDS
+The minimum attendance requirement is 75%.
+The minimum pass mark is 40%.
+The maximum course load is 21 credits.
+The minimum course load is 12 credits.
+The Academic probation threshold is 2.0 CGPA.
+The Dean's Honour List threshold is 3.75 CGPA.
+Grade A threshold is 80%.
+Grade B threshold is 65%.
+Grade C threshold is 50%.
+Grade D threshold is 40%.
+
+7. ACADEMIC ELIGIBILITY RULES
+- Eligibility for Course Registration: A student is eligible to register for a course if and only if the student has completed all prerequisites of the course.
+- Eligibility for Examinations: A student is eligible to take the course examination if and only if the student maintains an attendance of at least 75% in that course. Students with attendance below 75% are barred from examinations.
+- Eligibility for Capstone Project AI499: A student is eligible for Capstone Project AI499 if the student has completed AI401 and has earned at least 90 credits.
+- Eligibility for Dean's Honour List: A student qualifies for the Dean's Honour List if the student attains a CGPA of at least 3.75 with a minimum of 15 completed credits.
+- Academic Probation: A student is placed on academic probation if their cumulative CGPA falls below 2.0.

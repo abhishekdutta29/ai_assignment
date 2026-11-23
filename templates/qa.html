@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Ask Questions & Reasoning Trace – KnowledgeLens{% endblock %}
+
+{% block content %}
+<div class="page-container">
+    <div class="page-header">
+        <div>
+            <h1 class="page-title"><i class="fa-solid fa-comments"></i> Module 2 & 3: Symbolic Question Answering & Reasoning Trace</h1>
+            <p class="page-description">
+                Answers natural language questions strictly from the Knowledge Base using 5 symbolic reasoning techniques. Every response includes a complete, verifiable reasoning trace with provenanced evidence.
+            </p>
+        </div>
+        <div class="header-buttons">
+            <button id="toggleProfileBtn" class="btn btn-outline">
+                <i class="fa-solid fa-user-graduate"></i> Configure Student Profile
+            </button>
+        </div>
+    </div>
+
+    <!-- Student Profile Drawer (Collapsible) -->
+    <div id="studentProfileDrawer" class="card profile-drawer hidden">
+        <div class="card-header">
+            <h2><i class="fa-solid fa-id-card"></i> Student State Configuration (For Forward & Backward Chaining)</h2>
+            <button id="closeProfileBtn" class="btn-clear"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="card-body">
+            <form id="profileForm" class="profile-grid">
+                <div class="form-group">
+                    <label>Student ID:</label>
+                    <input type="text" id="profStudentId" class="form-input" value="{{ profile.student_id }}">
+                </div>
+                <div class="form-group">
+                    <label>Attendance Rate (%):</label>
+                    <input type="number" id="profAttendance" class="form-input" min="0" max="100" step="1" value="{{ profile.attendance }}">
+                </div>
+                <div class="form-group">
+                    <label>Cumulative CGPA (out of 4.0):</label>
+                    <input type="number" id="profCgpa" class="form-input" min="0" max="4.0" step="0.05" value="{{ profile.cgpa }}">
+                </div>
+                <div class="form-group">
+                    <label>Completed Credits:</label>
+                    <input type="number" id="profCredits" class="form-input" min="0" max="160" value="{{ profile.completed_credits }}">
+                </div>
+                <div class="form-group">
+                    <label>Semester Credit Load:</label>
+                    <input type="number" id="profSemesterCredits" class="form-input" min="0" max="30" value="{{ profile.current_semester_credits }}">
+                </div>
+                <div class="form-group full-width">
+                    <label>Completed Courses (comma-separated):</label>
+                    <input type="text" id="profCompletedCourses" class="form-input" value="{{ profile.completed_courses|join(', ') }}">
+                </div>
+                <div class="form-actions full-width">
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Update Student State</button>
+                    <button type="button" id="resetProfileBtn" class="btn btn-secondary"><i class="fa-solid fa-arrow-rotate-left"></i> Reset Defaults</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Example Question Chips -->
+    <div class="example-chips-container">
+        <div class="chips-label"><i class="fa-solid fa-lightbulb"></i> Try Example Questions:</div>
+        <div class="chips-wrapper">
+            <button class="chip" data-q="Who teaches Artificial Intelligence?"><span class="chip-tag fact">Fact</span> Who teaches Artificial Intelligence?</button>
+            <button class="chip" data-q="How many credits does Machine Learning carry?"><span class="chip-tag fact">Fact</span> Credits of Machine Learning?</button>
+            <button class="chip" data-q="What are all prerequisites of Deep Learning?"><span class="chip-tag graph">BFS Chain</span> Prerequisite chain of Deep Learning?</button>
+            <button class="chip" data-q="Is CS101 required before Machine Learning?"><span class="chip-tag reach">Reachability</span> Is CS101 required before ML?</button>
+            <button class="chip" data-q="Is the student eligible for AI499 Capstone Project?"><span class="chip-tag forward">Forward</span> Is student eligible for Capstone?</button>
+            <button class="chip" data-q="Does the student qualify for the Dean's Honour List?"><span class="chip-tag forward">Forward</span> Qualify for Dean's List?</button>
+            <button class="chip" data-q="Why is student barred from exam?"><span class="chip-tag backward">Backward</span> Why is student barred from exam?</button>
+            <button class="chip" data-q="What is the total credit count of Semester 1 courses?"><span class="chip-tag agg">Sum</span> Total credits of Semester 1?</button>
+            <button class="chip" data-q="Which course has more credits, AI499 or CS101?"><span class="chip-tag compare">Compare</span> Which has more credits, AI499 or CS101?</button>
+            <button class="chip" data-q="Who is the instructor for Machne Learnng?"><span class="chip-tag fuzzy">Typo/Fuzzy</span> Instructor for Machne Learnng?</button>
+            <button class="chip" data-q="Who teaches Quantum Physics?"><span class="chip-tag adv">Adversarial</span> Who teaches Quantum Physics?</button>
+        </div>
+    </div>
+
+    <!-- Main QA Layout: Left Chat, Right Reasoning Trace -->
+    <div class="qa-grid">
+        <!-- Chat Column -->
+        <div class="card chat-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-message"></i> Q&A Dialogue</h2>
+                <button id="clearChatBtn" class="btn btn-sm btn-outline"><i class="fa-solid fa-trash-can"></i> Clear</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message assistant-msg">
+                    <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="msg-content">
+                        <p>Hello! I am <strong>KnowledgeLens</strong>, a symbolic question answering system. I reason over the parsed Knowledge Base using formal logic, graph traversal, and inference rules. Ask me any question or click a chip above.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <form id="chatForm" class="chat-form">
+                    <input type="text" id="chatInput" class="chat-input" placeholder="Ask a question about courses, prerequisites, policies, instructors..." autocomplete="off">
+                    <button type="submit" id="sendBtn" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i></button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Live Reasoning Trace Column -->
+        <div class="card trace-card">
+            <div class="card-header">
+                <h2><i class="fa-solid fa-microscope"></i> Symbolic Reasoning Trace</h2>
+                <span id="traceStatusBadge" class="badge badge-secondary">Awaiting Query</span>
+            </div>
+            <div class="card-body trace-body" id="traceContainer">
+                <div class="empty-trace-state" id="emptyTraceState">
+                    <i class="fa-solid fa-brain empty-icon"></i>
+                    <p>Submit a question to inspect the real-time reasoning trace:</p>
+                    <ul class="empty-feature-list">
+                        <li><i class="fa-solid fa-check"></i> Query AST & Entity Linking with Levenshtein scoring</li>
+                        <li><i class="fa-solid fa-check"></i> Symbolic technique selection & Big-O complexity</li>
+                        <li><i class="fa-solid fa-check"></i> Forward/backward chaining rule provenance</li>
+                        <li><i class="fa-solid fa-check"></i> Graph traversal paths & supporting triples</li>
+                    </ul>
+                </div>
+
+                <div id="activeTraceContent" class="hidden">
+                    <!-- Technique Badge -->
+                    <div class="trace-section">
+                        <div class="trace-section-title"><i class="fa-solid fa-compass"></i> Technique Selected</div>
+                        <div class="technique-callout">
+                            <h3 id="traceTechniqueName">Direct Triple Store Lookup</h3>
+                            <p id="traceTechniqueRationale" class="text-muted"></p>
+                            <span class="badge badge-complexity" id="traceComplexity">O(1)</span>
+                        </div>
+                    </div>
+
+                    <!-- Query Analysis & Entity Linking -->
+                    <div class="trace-section">
+                        <div class="trace-section-title"><i class="fa-solid fa-magnifying-glass-nodes"></i> Query Parsing & Entity Linking</div>
+                        <div class="query-ast-box">
+                            <div><strong>Question Type:</strong> <code id="astQType">FACT_LOOKUP</code></div>
+                            <div><strong>Target Predicate:</strong> <code id="astPredicate">None</code></div>
+                            <div style="margin-top: 6px;"><strong>Linked Entities:</strong></div>
+                            <div id="astEntitiesList" class="ast-entities-container"></div>
+                        </div>
+                    </div>
+
+                    <!-- Execution Steps -->
+                    <div class="trace-section">
+                        <div class="trace-section-title"><i class="fa-solid fa-shoe-prints"></i> Execution Step Trace</div>
+                        <ol id="traceStepsList" class="trace-steps-list"></ol>
+                    </div>
+
+                    <!-- Proof Tree (if available) -->
+                    <div class="trace-section hidden" id="proofTreeSection">
+                        <div class="trace-section-title"><i class="fa-solid fa-sitemap"></i> Backward Chaining Proof Tree</div>
+                        <div id="proofTreeContainer" class="proof-tree-box"></div>
+                    </div>
+
+                    <!-- Supporting Triples & Evidence -->
+                    <div class="trace-section">
+                        <div class="trace-section-title"><i class="fa-solid fa-quote-left"></i> Supporting Evidence Triples</div>
+                        <div id="evidenceTriplesContainer" class="evidence-list"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/qa.js"></script>
+{% endblock %}

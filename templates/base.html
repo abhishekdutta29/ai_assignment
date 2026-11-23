@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}KnowledgeLens{% endblock %} – Symbolic Document QA System</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Vis.js Network CDN with embedded canvas fallback -->
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-container">
+            <div class="brand">
+                <a href="/builder" class="brand-link">
+                    <div class="brand-icon">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <div class="brand-text">
+                        <span class="brand-title">KnowledgeLens</span>
+                    </div>
+                </a>
+            </div>
+
+            <nav class="app-nav">
+                <a href="/builder" class="nav-item {% if active_page == 'builder' %}active{% endif %}">
+                    <i class="fa-solid fa-file-circle-plus"></i>
+                    <span>1. Ingest & Direct Q&A</span>
+                </a>
+                <a href="/qa" class="nav-item {% if active_page == 'qa' %}active{% endif %}">
+                    <i class="fa-solid fa-comments"></i>
+                    <span>2. Ask Questions</span>
+                </a>
+                <a href="/eval" class="nav-item {% if active_page == 'eval' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>3. Evaluation</span>
+                </a>
+            </nav>
+
+            <div class="header-actions">
+                <button id="themeToggleBtn" class="btn-icon" title="Toggle Light/Dark Theme">
+                    <i class="fa-solid fa-sun" id="themeIcon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="app-main">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="app-footer">
+        <div class="footer-container">
+            <div>
+                <strong>KnowledgeLens</strong> &bull; Classical Symbolic AI Architecture (Knowledge Representation, First-Order Inference & Graph Search)
+            </div>
+            <div>
+                Strictly Zero-NLP & Zero-RAG &bull; Course AID201A Artificial Intelligence Assignment
+            </div>
+        </div>
+    </footer>
+
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="/static/js/main.js"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
