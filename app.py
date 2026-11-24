@@ -197,36 +197,56 @@ def api_kb_load_default():
 @app.route("/api/upload", methods=["POST"])
 def api_upload():
     global current_document_name, kb_instance
-    raw_text = ""
-    filename = ""
+    try:
+        raw_text = ""
+        filename = ""
 
-    if "file" in request.files and request.files["file"].filename != "":
-        f = request.files["file"]
-        filename = secure_filename(f.filename)
-        save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
-        f.save(save_path)
-        raw_text = DocumentExtractor.extract_text_from_file(save_path)
-        current_document_name = filename
-    elif "pasted_text" in request.form and request.form["pasted_text"].strip() != "":
-        raw_text = request.form["pasted_text"].strip()
-        current_document_name = "Custom Pasted Document"
-    else:
-        return jsonify({"status": "error", "message": "No file uploaded or text provided."}), 400
+        if "file" in request.files and request.files["file"].filename != "":
+            f = request.files["file"]
+            filename = secure_filename(f.filename)
+            save_path = os.path.join(app.config["UPLOAD_FOLDER"], filename)
+            f.save(save_path)
+            raw_text = DocumentExtractor.extract_text_from_file(save_path)
+            current_document_name = filename
+        elif "pasted_text" in request.form and request.form["pasted_text"].strip() != "":
+            raw_text = request.form["pasted_text"].strip()
+            current_document_name = "Custom Pasted Document"
+        else:
+            return jsonify({"status": "error", "message": "No file uploaded or text provided."}), 400
 
-    if not raw_text:
-        return jsonify({"status": "error", "message": "Document content was empty."}), 400
+        if not raw_text:
+            return jsonify({"status": "error", "message": "Document content was empty."}), 400
 
-    extraction_res = extractor_instance.extract_from_text(raw_text)
-    kb_instance.populate(extraction_res)
+        extraction_res = extractor_instance.extract_from_text(raw_text)
+        kb_instance.populate(extraction_res)
 
-    return jsonify({
-        "status": "success",
-        "message": f"Successfully parsed '{current_document_name}'.",
-        "doc_name": current_document_name,
-        "triples_count": kb_instance.triple_store.count(),
-        "entities_count": len(kb_instance.entity_index.canonical_entities),
-        "metadata": kb_instance.metadata
-    })
+        return jsonify({
+            "status": "success",
+            "message": f"Successfully parsed '{current_document_name}'.",
+            "doc_name": current_document_name,
+            "triples_count": kb_instance.triple_store.count(),
+            "entities_count": len(kb_instance.entity_index.canonical_entities),
+            "metadata": kb_instance.metadata
+        })
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            "status": "error",
+            "message": f"Failed to parse document: {str(e)}"
+        }), 500
+
+@app.errorhandler(500)
+def handle_500(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"status": "error", "message": "Internal Server Error"}), 500
+    return "Internal Server Error", 500
+
+@app.errorhandler(404)
+def handle_404(e):
+    if request.path.startswith("/api/"):
+        return jsonify({"status": "error", "message": "API endpoint not found"}), 404
+    return redirect("/builder")
 
 @app.route("/api/ask", methods=["POST"])
 def api_ask():

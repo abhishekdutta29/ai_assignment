@@ -191,7 +191,16 @@ document.addEventListener('DOMContentLoaded', () => {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ question: questionText })
         })
-        .then(r => r.json())
+        .then(async r => {
+            const text = await r.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                throw new Error(`Server returned status ${r.status} (${r.statusText || 'Unexpected response'})`);
+            }
+            return data;
+        })
         .then(data => {
             directAskBtn.disabled = false;
             directAskBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Ask Question';
@@ -326,7 +335,16 @@ document.addEventListener('DOMContentLoaded', () => {
         window.showToast('Extracting knowledge triples from ' + fileInput.files[0].name + '...', 'info');
 
         fetch('/api/upload', { method: 'POST', body: formData })
-            .then(r => r.json())
+            .then(async r => {
+                const text = await r.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error(`Server returned status ${r.status} (${r.statusText || 'Unexpected response'})`);
+                }
+                return data;
+            })
             .then(data => {
                 uploadFileBtn.disabled = false;
                 if (data.status === 'success') {
@@ -351,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 uploadFileBtn.innerHTML = '<i class="fa-solid fa-gears"></i> Extract & Build Knowledge Base';
                 uploadFileBtn.classList.remove('btn-success');
                 uploadFileBtn.classList.add('btn-primary');
-                window.showToast('Upload failed: ' + err, 'error');
+                window.showToast('Upload failed: ' + err.message, 'error');
             });
     }
 
@@ -366,7 +384,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const formData = new FormData(pasteForm);
         window.showToast('Extracting knowledge triples from pasted text...', 'info');
         fetch('/api/upload', { method: 'POST', body: formData })
-            .then(r => r.json())
+            .then(async r => {
+                const text = await r.text();
+                let data;
+                try {
+                    data = JSON.parse(text);
+                } catch (e) {
+                    throw new Error(`Server returned status ${r.status} (${r.statusText || 'Unexpected response'})`);
+                }
+                return data;
+            })
             .then(data => {
                 if (data.status === 'success') {
                     window.showToast(data.message, 'success');
@@ -379,6 +406,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                     window.showToast(data.message, 'error');
                 }
+            })
+            .catch(err => {
+                window.showToast('Extraction failed: ' + err.message, 'error');
             });
     });
 
