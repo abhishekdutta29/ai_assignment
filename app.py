@@ -8,6 +8,7 @@ import os
 import json
 import csv
 import io
+import tempfile
 from flask import Flask, render_template, request, jsonify, Response, send_file, redirect
 from werkzeug.utils import secure_filename
 
@@ -21,7 +22,12 @@ from src.inference_rules import StudentProfile, get_all_inference_rules
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 SAMPLE_DATA_DIR = os.path.join(BASE_DIR, "sample_data")
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+
+# On serverless platforms like Vercel, the application root is read-only; use /tmp for uploads
+if os.environ.get("VERCEL"):
+    UPLOAD_FOLDER = os.path.join(tempfile.gettempdir(), "knowledgelens_uploads")
+else:
+    UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__, template_folder=os.path.join(BASE_DIR, "templates"), static_folder=os.path.join(BASE_DIR, "static"))
