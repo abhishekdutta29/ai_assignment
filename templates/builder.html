@@ -293,39 +293,67 @@ document.addEventListener('DOMContentLoaded', () => {
         if (fileInput.files.length > 0) {
             fileNameSpan.textContent = fileInput.files[0].name;
             selectedFileDiv.classList.remove('hidden');
+            // Auto-trigger extraction immediately upon selecting or dropping a file
+            triggerFileUpload();
         }
     }
 
     removeFileBtn.addEventListener('click', () => {
         fileInput.value = '';
         selectedFileDiv.classList.add('hidden');
+        const uploadFileBtn = document.getElementById('uploadFileBtn');
+        uploadFileBtn.innerHTML = '<i class="fa-solid fa-gears"></i> Extract & Build Knowledge Base';
+        uploadFileBtn.classList.remove('btn-success');
+        uploadFileBtn.classList.add('btn-primary');
     });
 
     // Upload file submission
     uploadForm.addEventListener('submit', (e) => {
         e.preventDefault();
+        triggerFileUpload();
+    });
+
+    function triggerFileUpload() {
         if (!fileInput.files.length) {
             window.showToast('Please select a file to upload.', 'error');
             return;
         }
+        const uploadFileBtn = document.getElementById('uploadFileBtn');
+        uploadFileBtn.disabled = true;
+        uploadFileBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Extracting & Building Knowledge Base...';
+
         const formData = new FormData(uploadForm);
-        window.showToast('Extracting knowledge triples from file...', 'info');
+        window.showToast('Extracting knowledge triples from ' + fileInput.files[0].name + '...', 'info');
+
         fetch('/api/upload', { method: 'POST', body: formData })
             .then(r => r.json())
             .then(data => {
+                uploadFileBtn.disabled = false;
                 if (data.status === 'success') {
+                    uploadFileBtn.innerHTML = `<i class="fa-solid fa-circle-check"></i> Knowledge Base Built (${data.triples_count || 0} Triples)`;
+                    uploadFileBtn.classList.remove('btn-primary');
+                    uploadFileBtn.classList.add('btn-success');
                     window.showToast(data.message, 'success');
-                    const activeBadge = document.getElementById('activeDocName');
-                    if (activeBadge) activeBadge.textContent = data.doc_name;
-                    document.getElementById('currentDocPill').textContent = data.doc_name;
+
+                    const docPill = document.getElementById('currentDocPill');
+                    if (docPill) docPill.textContent = data.doc_name;
+
                     updateStats(data);
-                    // Scroll down to the Q&A section
-                    document.getElementById('qaSection').scrollIntoView({ behavior: 'smooth' });
                 } else {
+                    uploadFileBtn.innerHTML = '<i class="fa-solid fa-gears"></i> Extract & Build Knowledge Base';
+                    uploadFileBtn.classList.remove('btn-success');
+                    uploadFileBtn.classList.add('btn-primary');
                     window.showToast(data.message, 'error');
                 }
+            })
+            .catch(err => {
+                uploadFileBtn.disabled = false;
+                uploadFileBtn.innerHTML = '<i class="fa-solid fa-gears"></i> Extract & Build Knowledge Base';
+                uploadFileBtn.classList.remove('btn-success');
+                uploadFileBtn.classList.add('btn-primary');
+                window.showToast('Upload failed: ' + err, 'error');
             });
-    });
+    }
 
     // Paste text submission
     pasteForm.addEventListener('submit', (e) => {
